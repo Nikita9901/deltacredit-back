@@ -1,94 +1,94 @@
-const bcrypt = require("bcrypt");
-const db = require("../database/db");
-const jwt = require("jsonwebtoken");
-const uuid = require("uuid");
 const userService = require("../services/user-service");
 
 class UserController {
-  async createUser(req, res) {
+  async createUser(req, res, next) {
     try {
-      const { username, email, password } = req.body;
-      console.log(await db.query(`select * from users;`));
-      const userData = await userService.createUser(email, username, password);
+      const { email, password } = req.body;
+      const userData = await userService.createUser(email, password);
       if (userData) {
         res.cookie("refreshToken", userData.refreshToken, {
           maxAge: 30 * 24 * 60 * 60 * 1000,
           httpOnly: true,
-          secure: true,
         });
         return res.json(userData);
       }
     } catch (error) {
-      return res.status(401).send("Authentication failed");
+      next(error);
     }
   }
 
-  async loginUser(req, res) {
+  async loginUser(req, res, next) {
     try {
       const { email, password } = req.body;
-      const userFind = await db.query(
-        `select *
-                 from users
-                 where email = $1;`,
-        [email]
-      );
-      const user = userFind.rows[0];
-      if (user) {
-        const isSame = await bcrypt.compare(password, user.password);
-
-        if (isSame) {
-          let token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
-            expiresIn: 24 * 60 * 60 * 1000,
-          });
-          res.cookie("jwt", token, {
-            maxAge: 24 * 60 * 60,
-            httpOnly: true,
-          });
-          console.log("user", JSON.stringify(user, null, 2));
-          console.log(token);
-          //send user data
-          return res.status(201).send(user);
-        } else {
-          return res.status(401).send("Authentication failed");
-        }
-      } else {
-        console.log("No user found");
-        return res.status(401).send("Authentication failed");
+      const userData = await userService.loginUser(email, password);
+      if (userData) {
+        res.cookie("refreshToken", userData.refreshToken, {
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+        });
+        return res.json(userData);
       }
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 
-  async getUsers(req, res) {
-    const users = await db.query("select * from users");
-    res.json(users.rows);
-  }
-
-  async getUser(req, res) {
-    const id = req.params.id;
-    const user = await db.query(
-      `select *
-             from users
-             where users.id_user = $1`,
-      [id]
-    );
-    res.json(user.rows[0]);
-  }
-
-  async logoutUser(req, res) {
+  async getUsers(req, res, next) {
     try {
-    } catch (error) {}
+      const users = await userService.getAllUsers();
+      return res.json(users);
+    } catch (err) {
+      next(err)
+    }
   }
 
-  async activateUser(req, res) {
+  // async getUser(req, res) {
+  //   const id = req.params.id;
+  //   const user = await db.query(
+  //     `select *
+  //            from users
+  //            where users.id_user = $1`,
+  //     [id]
+  //   );
+  //   res.json(user.rows[0]);
+  // }
+
+  async logoutUser(req, res, next) {
     try {
-    } catch (error) {}
+      const { refreshToken } = req.cookies;
+      const token = userService.logout(refreshToken);
+      res.clearCookie("refreshToken");
+      return res.json(token);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async refreshToken(req, res) {
+  async activateUser(req, res, next) {
     try {
-    } catch (error) {}
+      const activationLink = req.params.link;
+      await userService.activate(activationLink);
+      return res.redirect(process.env.CLIENT_URL);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async refreshToken(req, res, next) {
+    try {
+      const { refreshToken } = req.cookies;
+      console.log(req.cookies.refreshToken, '-----------------------------------------------------------')
+      const userData = await userService.refresh(refreshToken);
+      if (userData) {
+        res.cookie("refreshToken", userData.refreshToken, {
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+        });
+        return res.json(userData);
+      }
+    } catch (error) {
+      next(error);
+    }
   }
 
   // async updateUser(req, res) {

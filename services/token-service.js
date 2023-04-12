@@ -1,37 +1,45 @@
 const db = require("../database/db");
 const jwt = require("jsonwebtoken");
-const uuid = require("uuid");
 
 class TokenService {
   generateToken(payload) {
-    const activationLink = uuid.v4();
     const accessToken = jwt.sign(
       payload,
-      // { id: newPerson.rows[0].id_user },
       process.env.JWT_ACCESS_SECRET_KEY,
       {
-        expiresIn: 30 * 60 * 1000,
+        expiresIn: '10s',
       }
     );
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET_KEY, {
-      expiresIn: 30 * 24 * 60 * 60 * 1000,
+      expiresIn: '20s',
     });
     return {
       accessToken,
       refreshToken,
     };
-
-    // res.cookie("jwt", token, { maxAge: 24 * 60 * 60, httpOnly: true });
-    // console.log("user", JSON.stringify(newPerson.rows[0], null, 2));
-    // console.log(token);
-    // //send users details
-    // return res.status(201).send(newPerson.rows[0]);
   }
+
+  validateAccessToken(token){
+    try {
+      return jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+    } catch (e){
+      return null;
+    }
+  }
+  validateRefreshToken(token){
+    try {
+      return jwt.verify(token, process.env.JWT_REFRESH_SECRET_KEY);
+    } catch (e){
+      return null;
+    }
+  }
+
+
   async saveToken(userId, refreshToken) {
     const tokenData = await db.query(`select * from tokens where user_id=$1;`, [
       userId,
     ]);
-    if (tokenData) {
+    if (tokenData.rows[0]) {
       return await db.query(
         `update tokens set refresh_token=$1 where user_id=$2;`,
         [refreshToken, userId]
@@ -42,6 +50,18 @@ class TokenService {
         [userId, refreshToken]
       );
     }
+  }
+
+  async removeToken(refreshToken){
+    return await db.query(`delete from tokens where refresh_token=$1`, [
+      refreshToken,
+    ]);
+  }
+
+  async findToken(refreshToken){
+    const tokenData = await db.query(`select * from tokens where refresh_token=$1`, [refreshToken])
+    console.log(tokenData.rows)
+    return tokenData.rows[0];
   }
 }
 

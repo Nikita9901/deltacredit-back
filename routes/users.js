@@ -1,17 +1,17 @@
 var express = require("express");
 var router = express.Router();
+const authMiddleware = require('../middlewares/auth-middleware')
 
 const userController = require("../controllers/users.controller");
 
-/* GET users listing. */
 router.post("/signup", userController.createUser);
-router.get("/users", userController.getUsers);
-router.get("/users/:id", userController.getUser);
+router.post("/users", authMiddleware, userController.getUsers);
 router.post("/login", userController.loginUser);
 router.post("/logout", userController.logoutUser);
-router.get("/refresh", userController.refreshToken);
+router.post("/refresh", userController.refreshToken);
 router.get("/activate-user/:link", userController.activateUser);
-router.get("/", function (req, res, next) {
+router.post("/activate-user/:link", userController.activateUser);
+router.get("/", function (req, res) {
   res.send("respond with a resource");
 });
 
