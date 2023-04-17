@@ -7,7 +7,7 @@ class TokenService {
       payload,
       process.env.JWT_ACCESS_SECRET_KEY,
       {
-        expiresIn: '60s',
+        expiresIn: '30m',
       }
     );
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET_KEY, {
@@ -60,7 +60,6 @@ class TokenService {
 
   async findToken(refreshToken){
     const tokenData = await db.query(`select * from tokens where refresh_token=$1`, [refreshToken])
-    console.log(tokenData.rows)
     return tokenData.rows[0];
   }
 }

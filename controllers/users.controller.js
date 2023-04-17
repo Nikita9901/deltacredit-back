@@ -1,4 +1,5 @@
 const userService = require("../services/user-service");
+const tokenService = require("../services/token-service");
 
 class UserController {
   async createUser(req, res, next) {
@@ -38,20 +39,40 @@ class UserController {
       const users = await userService.getAllUsers();
       return res.json(users);
     } catch (err) {
-      next(err)
+      next(err);
     }
   }
 
-  // async getUser(req, res) {
-  //   const id = req.params.id;
-  //   const user = await db.query(
-  //     `select *
-  //            from users
-  //            where users.id_user = $1`,
-  //     [id]
-  //   );
-  //   res.json(user.rows[0]);
-  // }
+  async getUser(req, res, next) {
+    try {
+      const id = req.params.id;
+      const user = await userService.getUser(id);
+      return res.json(user);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateUser(req, res, next) {
+    try {
+      const { refreshToken } = req.cookies;
+      const idToken = (await tokenService.findToken(refreshToken)).user_id;
+      const idParams = req.params.id;
+      const { name, surname, phone_number, username } = req.body;
+      const user = await userService.updateUser(
+        name,
+        surname,
+        phone_number,
+        username,
+        idParams,
+        idToken
+      );
+      console.log(user);
+      res.json(user);
+    } catch (err) {
+      next(err);
+    }
+  }
 
   async logoutUser(req, res, next) {
     try {
@@ -77,7 +98,6 @@ class UserController {
   async refreshToken(req, res, next) {
     try {
       const { refreshToken } = req.cookies;
-      console.log(req.cookies.refreshToken, '-----------------------------------------------------------')
       const userData = await userService.refresh(refreshToken);
       if (userData) {
         res.cookie("refreshToken", userData.refreshToken, {
@@ -91,14 +111,6 @@ class UserController {
     }
   }
 
-  // async updateUser(req, res) {
-  //   const { id, name, surname } = req.body;
-  //   const user = await db.query(
-  //     `update person set name=$1, surname=$2 where id=$3 returning *`,
-  //     [name, surname, id]
-  //   );
-  //   res.json(user.rows);
-  // }
   // async deleteUser(req, res) {
   //   const id = req.params.id;
   //   const user = await db.query(`delete from person where person.id = $1`, [

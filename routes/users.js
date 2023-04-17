@@ -9,7 +9,8 @@ router.post("/users", authMiddleware, userController.getUsers);
 router.post("/login", userController.loginUser);
 router.post("/logout", userController.logoutUser);
 router.post("/refresh", userController.refreshToken);
-router.get("/activate-user/:link", userController.activateUser);
+router.post("/user/:id", userController.getUser);
+router.post("/user/edit/:id", userController.updateUser);
 router.post("/activate-user/:link", userController.activateUser);
 router.get("/", function (req, res) {
   res.send("respond with a resource");

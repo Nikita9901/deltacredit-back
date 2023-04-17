@@ -7,6 +7,7 @@ const errorMiddleware = require("./middlewares/error-middleware");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+var creditsRouter = require("./routes/credits");
 
 var app = express();
 
@@ -25,7 +26,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 app.use("/*", indexRouter);
-app.use("/api", usersRouter);
+app.use("/api", usersRouter, creditsRouter);
 app.use(errorMiddleware);
 
 module.exports = app;
