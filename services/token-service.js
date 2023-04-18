@@ -36,31 +36,31 @@ class TokenService {
 
 
   async saveToken(userId, refreshToken) {
-    const tokenData = await db.query(`select * from tokens where user_id=$1;`, [
+    const tokenData = await db.query(`select * from tokens where user_id=?;`, [
       userId,
     ]);
-    if (tokenData.rows[0]) {
+    if (tokenData[0][0]) {
       return await db.query(
-        `update tokens set refresh_token=$1 where user_id=$2;`,
+        `update tokens set refresh_token=? where user_id=?;`,
         [refreshToken, userId]
       );
     } else {
       return await db.query(
-        `insert into tokens (user_id, refresh_token) values ($1, $2);`,
+        `insert into tokens (user_id, refresh_token) values (?, ?);`,
         [userId, refreshToken]
       );
     }
   }
 
   async removeToken(refreshToken){
-    return await db.query(`delete from tokens where refresh_token=$1`, [
+    return await db.query(`delete from tokens where refresh_token=?`, [
       refreshToken,
     ]);
   }
 
   async findToken(refreshToken){
-    const tokenData = await db.query(`select * from tokens where refresh_token=$1`, [refreshToken])
-    return tokenData.rows[0];
+    const tokenData = await db.query(`select * from tokens where refresh_token=?`, [refreshToken])
+    return tokenData[0][0];
   }
 }
 

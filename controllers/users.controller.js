@@ -1,5 +1,6 @@
 const userService = require("../services/user-service");
 const tokenService = require("../services/token-service");
+const db = require("../database/db");
 
 class UserController {
   async createUser(req, res, next) {
@@ -67,7 +68,6 @@ class UserController {
         idParams,
         idToken
       );
-      console.log(user);
       res.json(user);
     } catch (err) {
       next(err);
@@ -116,7 +116,7 @@ class UserController {
   //   const user = await db.query(`delete from person where person.id = $1`, [
   //     id,
   //   ]);
-  //   res.json(user.rows);
+  //   res.json(user[0]);
   // }
 }
 
