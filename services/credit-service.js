@@ -16,12 +16,13 @@ class CreditService {
     if (!tokenData || !tokenFromDb) {
       throw ApiError.UnauthorizedError();
     }
-    const newCredit = await db.query(
-      `insert into money_offer (amount, percent, period, description, user_id)
-             values ($1, $2, $3, $4, $5)
-             returning *`,
+    await db.query(
+      `insert into money_offer (amount, percent, period_date, description, user_id)
+             values (?, ?, ?, ?, ?);`,
       [amount, percent, period, description, tokenFromDb.user_id]
     );
+
+    const newCredit = await db.query(`select * from money_offer where user_id=?`, [tokenFromDb.user_id])
     return newCredit[0][0];
   }
 
@@ -33,19 +34,24 @@ class CreditService {
     }
     const deletedCredit = await db.query(
       `select *
-                                              from money_offer
-                                              where id = $1`,
+             from money_offer
+             where id = $1`,
       [credit_id]
     );
     if (!deletedCredit[0][0])
       throw ApiError.BadRequest("Нет такого id кредита.");
     await db.query(
       `delete
-                        from money_offer
-                        where id = $1`,
+             from money_offer
+             where id = ?;`,
       [credit_id]
     );
     return deletedCredit[0][0];
+  }
+  async getUserCredits(user_id) {
+    const credits = await db.query(`select *
+                                        from money_offer where user_id=?`, [user_id]);
+    return credits[0];
   }
 }
 

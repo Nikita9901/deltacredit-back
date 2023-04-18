@@ -9,6 +9,15 @@ class CreditsController {
             next(error);
         }
     }
+    async getUserCredits(req, res, next) {
+        try {
+            const user_id = req.params.user_id;
+            const credits = await creditService.getUserCredits(user_id);
+            return res.json(credits);
+        } catch (error) {
+            next(error);
+        }
+    }
     async createCredit(req, res, next) {
         try {
             const { refreshToken } = req.cookies;
