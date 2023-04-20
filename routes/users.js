@@ -10,7 +10,7 @@ router.post("/login", userController.loginUser);
 router.post("/logout", userController.logoutUser);
 router.post("/refresh", userController.refreshToken);
 router.post("/user/:id", userController.getUser);
-router.post("/user/edit/:id", userController.updateUser);
+router.post("/user/edit/:id", authMiddleware, userController.updateUser);
 router.post("/activate-user/:link", userController.activateUser);
 router.get("/", function (req, res) {
   res.send("respond with a resource");
