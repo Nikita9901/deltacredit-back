@@ -12,7 +12,7 @@ class BorrowService {
     return borrows[0];
   }
 
-  async createBorrowRequest(userId, creditId, amount, percen) {
+  async createBorrowRequest(userId, creditId, amount, percent) {
     const isAlreadyExists = await db.query(
       `select *
              from borrow_request
