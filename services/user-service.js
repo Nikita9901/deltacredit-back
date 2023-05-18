@@ -17,7 +17,6 @@ class UserService {
              where email = ?;`,
       [data.email]
     );
-      console.log(userFind[0].length)
     if (userFind[0].length) {
       throw ApiError.BadRequest(
         `Пользователь с почтовым адресом ${data.email} уже существует.`
@@ -42,6 +41,11 @@ class UserService {
     // );
 
     const userData = new userDto(newPerson[0][0]);
+    await db.query(
+        `insert into passport_details (user_id)
+             values (?)`,
+        [userData.id]
+    );
     const tokens = tokenService.generateToken({ ...userData });
     await tokenService.saveToken(userData.id, tokens.refreshToken);
     return { ...tokens, user: newPerson[0][0] };

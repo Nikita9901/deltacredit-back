@@ -1,5 +1,6 @@
 const userService = require("../services/user-service");
 const tokenService = require("../services/token-service");
+const passportService = require("../services/passport-service");
 const db = require("../database/db");
 
 class UserController {
@@ -106,6 +107,37 @@ class UserController {
         });
         return res.json(userData);
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePassportDetails(req, res, next) {
+    try {
+      const { refreshToken } = req.cookies;
+      const idToken = (await tokenService.findToken(refreshToken)).user_id;
+      const {
+        name,
+        surname,
+        country,
+        city,
+        address,
+        passportSerialNumber,
+        passportIdNumber,
+        passportIssuedBy,
+      } = req.body;
+      const usersPassport = await passportService.updatePassportDetails(
+        name,
+        surname,
+        country,
+        city,
+        address,
+        passportSerialNumber,
+        passportIdNumber,
+        passportIssuedBy,
+        idToken
+      );
+      res.json(usersPassport);
     } catch (error) {
       next(error);
     }

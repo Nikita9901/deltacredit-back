@@ -8,6 +8,7 @@ router.post("/creditlist", creditsController.getCreditsList);
 router.post("/create-credit", authMiddleware, creditsController.createCredit);
 router.post("/delete-credit", authMiddleware, creditsController.deleteCredit);
 router.post("/get-userCredits/:user_id", creditsController.getUserCredits);
+router.post("/getCreditInfo/:creditId", creditsController.getCredit);
 // router.get("/", function (req, res) {
 //     res.send("respond with a resource");
 // });

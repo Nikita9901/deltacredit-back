@@ -12,6 +12,7 @@ router.post("/refresh", userController.refreshToken);
 router.post("/user/:id", userController.getUser);
 router.post("/user/edit/:id", authMiddleware, userController.updateUser);
 router.post("/activate-user/:link", userController.activateUser);
+router.post("/passport-details", userController.updatePassportDetails);
 router.get("/", function (req, res) {
   res.send("respond with a resource");
 });

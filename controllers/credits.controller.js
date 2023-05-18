@@ -38,6 +38,15 @@ class CreditsController {
             next(error);
         }
     }
+    async getCredit(req, res, next) {
+        try {
+            const credit_id = req.params.creditId;
+            const credit = await creditService.getCreditById(credit_id);
+            return res.json(credit);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CreditsController();

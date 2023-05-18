@@ -53,6 +53,11 @@ class CreditService {
                                         from money_offer where user_id=?`, [user_id]);
     return credits[0];
   }
+  async getCreditById(credit_id) {
+    const credits = await db.query(`select *
+                                        from money_offer where id=?`, [credit_id]);
+    return credits[0][0];
+  }
 }
 
 module.exports = new CreditService();
