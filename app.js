@@ -9,6 +9,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var creditsRouter = require("./routes/credits");
 var borrowsRouter = require("./routes/borrows")
+var transactionsRouter = require("./routes/transactions")
 
 var app = express();
 
@@ -28,7 +29,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 app.use("/*", indexRouter);
-app.use("/api", usersRouter, creditsRouter, borrowsRouter);
+app.use("/api", usersRouter, creditsRouter, borrowsRouter, transactionsRouter);
 app.use(errorMiddleware);
 
 module.exports = app;

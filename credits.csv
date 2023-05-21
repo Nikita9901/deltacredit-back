@@ -6,3 +6,4 @@ id,user_id,amount,percent,period_date,description,name,username,surname
 5,2,1000,45,90,1,2,2,2
 6,2,500,10,15,ddd,2,2,2
 7,2,55555,55,55,5555,2,2,2
+8,3,5000,15,10,Для нас,Andrew,2212,Ivanov
