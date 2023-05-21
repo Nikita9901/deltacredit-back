@@ -3,10 +3,15 @@ const db = require("../database/db");
 const ApiError = require("../exceptions/api-error");
 const tokenService = require("./token-service");
 
+const converter = require('json-2-csv')
+const fs = require("fs");
+
 class CreditService {
   async getAllCredits() {
     const credits = await db.query(`select *
-                                        from money_offer;`);
+                                    from money_offer
+                                             join (select id as user_id, name, username, surname from users) as t
+                                                  on money_offer.user_id = t.user_id;`);
     return credits[0];
   }
 
@@ -57,6 +62,17 @@ class CreditService {
     const credits = await db.query(`select *
                                         from money_offer where id=?`, [credit_id]);
     return credits[0][0];
+  }
+  async exportToCsv() {
+      const credits = await db.query(`select *
+                                    from money_offer
+                                             join (select id as user_id, name, username, surname from users) as t
+                                                  on money_offer.user_id = t.user_id;`);
+      await converter.json2csv(credits[0], (err, csv) => {
+          if (err) {
+              throw err
+          }
+      }).then(r => fs.writeFileSync('credits.csv', r))
   }
 }
 

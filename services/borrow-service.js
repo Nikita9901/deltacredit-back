@@ -12,6 +12,16 @@ class BorrowService {
     return borrows[0];
   }
 
+  async getUserBorrows(user_id) {
+    const borrows = await db.query(
+        `select *
+             from borrow_request
+             where user_id = ?;`,
+        [user_id]
+    );
+    return borrows[0];
+  }
+
   async createBorrowRequest(userId, creditId, amount, percent) {
     const isAlreadyExists = await db.query(
       `select *

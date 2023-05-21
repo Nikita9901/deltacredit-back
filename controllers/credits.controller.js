@@ -1,4 +1,5 @@
 const creditService = require("../services/credit-service");
+const fs = require("fs");
 
 class CreditsController {
     async getCreditsList(req, res, next) {
@@ -45,6 +46,19 @@ class CreditsController {
             return res.json(credit);
         } catch (error) {
             next(error);
+        }
+    }
+
+    async exportToCsv(req, res, next) {
+        try {
+            await creditService.exportToCsv();
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=credits.csv');
+
+            const fileStream = fs.createReadStream('credits.csv');
+            fileStream.pipe(res);
+        } catch (error) {
+            next(error)
         }
     }
 }

@@ -20,6 +20,15 @@ class BorrowsController {
             next(error)
         }
     }
+    async getUserBorrows(req, res, next) {
+        try {
+            const user_id = req.params.user_id;
+            const borrows = await borrowService.getUserBorrows(user_id);
+            return res.json(borrows);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new BorrowsController();
