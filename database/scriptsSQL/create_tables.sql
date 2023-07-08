@@ -65,7 +65,7 @@ create table borrow_request
     percent        float default 0,
     approval_date  date,
     foreign key (user_id) references users (id),
-    foreign key (money_offer_id) references money_offer (id)
+    foreign key (money_offer_id) references money_offer (id) ON DELETE CASCADE
 );
 
 create table transactions

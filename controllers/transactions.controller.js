@@ -4,7 +4,7 @@ class TransactionsController {
     async depositAmount(req, res, next) {
         try {
             const { amount, userId } = req.body;
-            const user = await transactionsService.depositAmount(userId, amount)
+            const user = await transactionsService.depositAmount(amount, userId)
             return res.json(user);
         } catch (error) {
             next(error)

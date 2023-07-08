@@ -40,7 +40,7 @@ class CreditService {
     const deletedCredit = await db.query(
       `select *
              from money_offer
-             where id = $1`,
+             where id = ?`,
       [credit_id]
     );
     if (!deletedCredit[0][0])

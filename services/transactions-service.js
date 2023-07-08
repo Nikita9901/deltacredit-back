@@ -4,14 +4,17 @@ const tokenService = require("./token-service");
 
 class TransactionsService {
     async depositAmount(amount, userId) {
+        console.log(amount, userId)
         await db.query(
             `insert into transactions (balance_change_amount, user_id, date)
-             values (?, ?, ?);`,
-            [amount, userId, Date.now()]
+             values (?, ?, CURRENT_DATE());`,
+            [Number(amount), Number(userId)]
         );
+        console.log(amount, userId)
+
         await db.query(
             `update users
-             set wallet=?
+             set wallet=wallet+?
              where id = ?`,
             [amount, userId],
         );
